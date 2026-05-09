@@ -12,6 +12,6 @@
       components:
       - MobState
   - type: Sprite
-    layers:
+    layers: #
     - state: spell
       color: '#FFB6C1'
