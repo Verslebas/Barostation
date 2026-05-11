@@ -8,38 +8,43 @@ using Robust.Shared.Console;
 using Robust.Shared.Network;
 using Robust.Shared.Player;
 using Robust.Shared.Prototypes;
-using Robust.Shared.Timing;
 using System.Linq;
 using System.Threading.Tasks;
 
 namespace Content.Server._BaroStation.Achievements;
 
-public sealed class AchievementsSystem : EntitySystem
+public sealed partial class AchievementsSystem : SharedAchievementsSystem
 {
-    [Dependency] private readonly IPrototypeManager _prototypeManager = default!;
-    [Dependency] private readonly IConsoleHost _consoleHost = default!;
-    [Dependency] private readonly ISharedPlayerManager _playerManager = default!;
-    [Dependency] private readonly ILogManager _logManager = default!;
-    [Dependency] private readonly IServerDbManager _dbManager = default!;
+    [Dependency] private IPrototypeManager _prototypeManager = default!;
+    [Dependency] private ILogManager _logManager = default!;
+    [Dependency] private IServerDbManager _dbManager = default!;
+    [Dependency] private IConsoleHost _consoleHost = default!;
 
-    private ISawmill _sawmill = default!;
     private readonly Dictionary<string, HashSet<string>> _playerAchievements = new();
+    public static AchievementsSystem? Instance { get; private set; }
 
     public override void Initialize()
     {
         base.Initialize();
-
-        _sawmill = _logManager.GetSawmill("achievements");
+        Instance = this;
 
         SubscribeNetworkEvent<RequestAchievementsMessage>(OnRequestAchievements);
         SubscribeLocalEvent<InventoryComponent, DidEquipEvent>(OnDidEquip);
         SubscribeLocalEvent<PlayerSpawnCompleteEvent>(OnPlayerSpawnComplete);
     }
 
-    private void OnPlayerSpawnComplete(PlayerSpawnCompleteEvent ev)
+    public override void Shutdown()
     {
-        var userId = ev.Player.UserId;
-        _ = LoadAndApplyAchievementsAsync(ev.Player, ev.Mob, userId);
+        base.Shutdown();
+        Instance = null;
+        _playerAchievements.Clear();
+    }
+
+    private async void OnPlayerSpawnComplete(PlayerSpawnCompleteEvent ev)
+    {
+        await LoadAndApplyAchievementsAsync(ev.Player, ev.Mob, ev.Player.UserId);
+
+        await SendAchievementsToClient(ev.Player);
     }
 
     private async Task LoadAndApplyAchievementsAsync(ICommonSession session, EntityUid mob, NetUserId userId)
@@ -54,16 +59,18 @@ public sealed class AchievementsSystem : EntitySystem
             var achievementComp = EnsureComp<PlayerAchievementsComponent>(mob);
             achievementComp.EarnedAchievements = earnedSet;
             Dirty(mob, achievementComp);
-
-            _sawmill.Info($"Loaded {earnedSet.Count} achievements for player {session.Name} from DB");
-
-            var stateMsg = new AchievementsStateMessage { EarnedIds = earnedIds };
-            RaiseNetworkEvent(stateMsg, session);
         }
-        catch (Exception ex)
+        catch (Exception)
         {
-            _sawmill.Error($"Failed to load achievements for {session.Name}: {ex}");
         }
+    }
+
+    public override bool HasAchievement(NetUserId userId, string achievementId)
+    {
+        if (!_playerAchievements.TryGetValue(userId.ToString(), out var achievements))
+            return false;
+
+        return achievements.Contains(achievementId);
     }
 
     private void OnDidEquip(EntityUid uid, InventoryComponent component, DidEquipEvent args)
@@ -76,11 +83,8 @@ public sealed class AchievementsSystem : EntitySystem
         if (string.IsNullOrEmpty(prototypeId))
             return;
 
-        _sawmill.Info($"Player equipped item: {prototypeId}");
-
         if (prototypeId == "ClothingMaskClown")
         {
-            _sawmill.Info($"Clown mask equipped! Granting achievement to {ToPrettyString(uid)}");
             GrantAchievement(uid, achievementComp, "ClownMaskAchievement");
         }
     }
@@ -92,7 +96,6 @@ public sealed class AchievementsSystem : EntitySystem
 
         if (!_prototypeManager.HasIndex<AchievementPrototype>(achievementId))
         {
-            _sawmill.Error($"Unknown achievement ID: {achievementId}");
             return;
         }
 
@@ -110,8 +113,6 @@ public sealed class AchievementsSystem : EntitySystem
 
             _playerAchievements[userId.ToString()].Add(achievementId);
 
-            _sawmill.Info($"Granted achievement {achievementId} to player {actor.PlayerSession.Name}");
-
             var msg = new AchievementEarnedMessage { AchievementId = achievementId };
             RaiseNetworkEvent(msg, actor.PlayerSession);
 
@@ -123,43 +124,23 @@ public sealed class AchievementsSystem : EntitySystem
     private void OnRequestAchievements(RequestAchievementsMessage msg, EntitySessionEventArgs args)
     {
         var player = args.SenderSession;
-        _sawmill.Info($"Received RequestAchievementsMessage from {player.Name}");
-
-        if (player.AttachedEntity == null)
-        {
-            _sawmill.Info($"Player {player.Name} has no attached entity, waiting...");
-            Timer.Spawn(TimeSpan.FromMilliseconds(100), () => OnRequestAchievements(msg, args));
-            return;
-        }
-
-        _ = LoadAndSendAchievementsAsync(player, player.AttachedEntity.Value);
+        _ = SendAchievementsToClient(player);
     }
 
-    private async Task LoadAndSendAchievementsAsync(ICommonSession session, EntityUid playerEntity)
+    private async Task SendAchievementsToClient(ICommonSession session)
     {
         try
         {
             var earnedIds = await _dbManager.GetPlayerAchievementsAsync(session.UserId);
-            var earnedSet = new HashSet<string>(earnedIds);
+            var earnedList = earnedIds.ToList();
 
-            _playerAchievements[session.UserId.ToString()] = earnedSet;
-
-            if (!TryComp<PlayerAchievementsComponent>(playerEntity, out var achievementComp))
-            {
-                achievementComp = AddComp<PlayerAchievementsComponent>(playerEntity);
-            }
-
-            achievementComp.EarnedAchievements = earnedSet;
-            Dirty(playerEntity, achievementComp);
-
-            var stateMsg = new AchievementsStateMessage { EarnedIds = earnedIds };
+            var stateMsg = new AchievementsStateMessage { EarnedIds = earnedList };
             RaiseNetworkEvent(stateMsg, session);
-
-            _sawmill.Info($"Sent {earnedIds.Count} achievements to {session.Name} from DB");
         }
-        catch (Exception ex)
+        catch (Exception)
         {
-            _sawmill.Error($"Failed to send achievements to {session.Name}: {ex}");
+            var stateMsg = new AchievementsStateMessage { EarnedIds = new List<string>() };
+            RaiseNetworkEvent(stateMsg, session);
         }
     }
 }

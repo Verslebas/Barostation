@@ -9,6 +9,7 @@
   - CaptainOuterClothing
   - Survival
   - Trinkets
+  - AchievementRewards
   #- CaptainJobTrinkets
   - GroupSpeciesBreathTool
 
@@ -24,6 +25,7 @@
   - Glasses
   - Survival
   - Trinkets
+  - AchievementRewards
   #- HoPJobTrinkets
   - GroupSpeciesBreathTool
 
@@ -53,6 +55,7 @@
   - Glasses
   - Survival
   - Trinkets
+  - AchievementRewards
   #- PassengerJobTrinkets
   - GroupSpeciesBreathTool
 
@@ -67,6 +70,7 @@
   - Glasses
   - Survival
   - Trinkets
+  - AchievementRewards
   - BartenderJobTrinkets
   - GroupSpeciesBreathTool
 
@@ -79,6 +83,7 @@
   - Glasses
   - Survival
   - Trinkets
+  - AchievementRewards
   #- ServiceWorkerJobTrinkets
   - GroupSpeciesBreathTool
 
@@ -94,6 +99,7 @@
   - Glasses
   - Survival
   - Trinkets
+  - AchievementRewards
   #- ChefJobTrinkets
   - GroupSpeciesBreathTool
 
@@ -106,6 +112,7 @@
   - Glasses
   - Survival
   - Trinkets
+  - AchievementRewards
   #- LibrarianJobTrinkets
   - GroupSpeciesBreathTool
 
@@ -119,6 +126,7 @@
   - Glasses
   - Survival
   - Trinkets
+  - AchievementRewards
   #- LawyerJobTrinkets
   - GroupSpeciesBreathTool
 
@@ -137,6 +145,7 @@
   - Glasses
   - Survival
   - Trinkets
+  - AchievementRewards
   #- ChaplainJobTrinkets
   - GroupSpeciesBreathTool
 
@@ -153,6 +162,7 @@
   - Survival
   - Trinkets
   - JanitorJobTrinkets
+  - AchievementRewards
   - GroupSpeciesBreathTool
 
 - type: roleLoadout
@@ -166,6 +176,7 @@
   - Glasses
   - Survival
   - Trinkets
+  - AchievementRewards
   #- BotanistJobTrinkets
   - GroupSpeciesBreathTool
 
@@ -183,6 +194,7 @@
   - SurvivalClown
   - Trinkets
   - ClownJobTrinkets
+  - AchievementRewards
 
 - type: roleLoadout
   id: JobMime
@@ -199,6 +211,7 @@
   - SurvivalMime
   - Trinkets
   #- MimeJobTrinkets
+  - AchievementRewards
 
 - type: roleLoadout
   id: JobMusician
@@ -213,6 +226,7 @@
   - Trinkets
   #- MusicianJobTrinkets
   - Instruments
+  - AchievementRewards
   - GroupSpeciesBreathTool
 
 # Cargo
@@ -230,6 +244,7 @@
   - Survival
   - Trinkets
   #- QuartermasterJobTrinkets
+  - AchievementRewards
   - GroupSpeciesBreathTool
 
 - type: roleLoadout
@@ -246,6 +261,7 @@
   - Survival
   - Trinkets
   #- CargoTechnicianJobTrinkets
+  - AchievementRewards
   - GroupSpeciesBreathTool
 
 - type: roleLoadout
@@ -259,6 +275,7 @@
   - Survival
   - Trinkets
   #- SalvageSpecialistJobTrinkets
+  - AchievementRewards
   - GroupSpeciesBreathTool
 
 # Engineering
@@ -275,6 +292,7 @@
   - SurvivalExtended
   - Trinkets
   #- ChiefEngineerJobTrinkets
+  - AchievementRewards
   - GroupSpeciesBreathTool
 
 - type: roleLoadout
@@ -286,6 +304,7 @@
   - SurvivalExtended
   - Trinkets
   #- TechnicalAssistantJobTrinkets
+  - AchievementRewards
   - GroupSpeciesBreathTool
 
 - type: roleLoadout
@@ -301,6 +320,7 @@
   - SurvivalExtended
   - Trinkets
   #- StationEngineerJobTrinkets
+  - AchievementRewards
   - GroupSpeciesBreathTool
 
 - type: roleLoadout
@@ -314,6 +334,7 @@
   - SurvivalExtended
   - Trinkets
   #- AtmosphericTechnicianJobTrinkets
+  - AchievementRewards
   - GroupSpeciesBreathTool
 
 # Science
@@ -332,6 +353,7 @@
   - Survival
   - Trinkets
   #- ResearchDirectorJobTrinkets
+  - AchievementRewards
   - GroupSpeciesBreathTool
 
 - type: roleLoadout
@@ -350,6 +372,7 @@
   - Survival
   - Trinkets
   #- ScientistJobTrinkets
+  - AchievementRewards
   - GroupSpeciesBreathTool
 
 - type: roleLoadout
@@ -362,6 +385,7 @@
   - Survival
   - Trinkets
   #- ResearchAssistantJobTrinkets
+  - AchievementRewards
   - GroupSpeciesBreathTool
 
 # Security
@@ -378,6 +402,7 @@
   - SurvivalSecurity
   - Trinkets
   - HeadofSecurityJobTrinkets
+  - AchievementRewards
   - GroupSpeciesBreathToolSecurity
 
 - type: roleLoadout
@@ -392,6 +417,7 @@
   - SurvivalSecurity
   - Trinkets
   - WardenJobTrinkets
+  - AchievementRewards
   - GroupSpeciesBreathToolSecurity
 
 - type: roleLoadout
@@ -407,6 +433,7 @@
   - SurvivalSecurity
   - Trinkets
   - SecurityJobTrinkets
+  - AchievementRewards
   - GroupSpeciesBreathToolSecurity
 
 - type: roleLoadout
@@ -421,6 +448,7 @@
   - SurvivalSecurity
   - Trinkets
   - DetectiveJobTrinkets
+  - AchievementRewards
   - GroupSpeciesBreathToolSecurity
 
 - type: roleLoadout
@@ -431,6 +459,7 @@
   - SurvivalSecurity
   - Trinkets
   #- SecurityCadetJobTrinkets
+  - AchievementRewards
   - GroupSpeciesBreathToolSecurity
 
 # Wildcards
@@ -446,6 +475,7 @@
   - Survival
   - Trinkets
   #- ReporterJobTrinkets
+  - AchievementRewards
   - GroupSpeciesBreathTool
 
 - type: roleLoadout
@@ -458,6 +488,7 @@
   - Survival
   - Trinkets
   #- PsychologistJobTrinkets
+  - AchievementRewards
   - GroupSpeciesBreathTool
 
 # These loadouts are used for non-crew spawns, like off-station antags and event mobs

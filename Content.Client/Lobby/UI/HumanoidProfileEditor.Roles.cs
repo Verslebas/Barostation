@@ -1,5 +1,4 @@
-using System.Linq;
-using System.Numerics;
+using Content.Client._BaroStation.Achievements;
 using Content.Client.Lobby.UI.Loadouts;
 using Content.Client.Lobby.UI.Roles;
 using Content.Shared.Clothing;
@@ -10,6 +9,8 @@ using Robust.Client.Graphics;
 using Robust.Client.UserInterface;
 using Robust.Client.UserInterface.Controls;
 using Robust.Shared.Prototypes;
+using System.Linq;
+using System.Numerics;
 
 namespace Content.Client.Lobby.UI;
 
@@ -59,6 +60,10 @@ public sealed partial class HumanoidProfileEditor
 
         JobOverride = jobProto;
         var session = _playerManager.LocalSession;
+
+        // Принудительно обновляем достижения перед открытием окна loadout
+        var achievementsController = UserInterfaceManager.GetUIController<AchievementsUIController>();
+        achievementsController.RequestAchievements();
 
         _loadoutWindow = new LoadoutWindow(Profile, roleLoadout, roleLoadoutProto, _playerManager.LocalSession, collection)
         {
