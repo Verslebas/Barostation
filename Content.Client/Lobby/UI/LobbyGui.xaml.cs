@@ -26,7 +26,12 @@ namespace Content.Client.Lobby.UI
             OptionsButton.OnPressed += _ => UserInterfaceManager.GetUIController<OptionsUIController>().ToggleWindow();
 
             AchievementsButton.OnPressed += _ =>
-                UserInterfaceManager.GetUIController<AchievementsUIController>().ToggleWindow();
+            {
+                // Принудительно запрашиваем достижения перед открытием окна
+                var achievementsController = UserInterfaceManager.GetUIController<AchievementsUIController>();
+                achievementsController.RequestAchievements();
+                achievementsController.ToggleWindow();
+            };
 
             CollapseButton.OnPressed += _ => TogglePanel(false);
             ExpandButton.OnPressed += _ => TogglePanel(true);

@@ -1,0 +1,17 @@
+- type: loadoutGroup
+  id: AchievementRewards
+  name: loadout-group-achievement-rewards
+  minLimit: 0
+  maxLimit: 3
+  loadouts:
+  - ClownMaskAchievementReward
+
+- type: loadout
+  id: ClownMaskAchievementReward
+  name: loadout-clown-mask-reward-name
+  description: loadout-clown-mask-reward-desc
+  effects:
+  - !type:AchievementLoadoutEffect
+    achievementId: ClownMaskAchievement
+  equipment:
+    mask: ClothingMaskClown

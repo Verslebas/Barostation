@@ -1,20 +1,16 @@
 using Content.Client.Lobby;
-using Content.Client.Lobby.UI;
-using Content.Client.UserInterface.Controls;
 using Content.Shared._BaroStation.Achievements;
 using Robust.Client.Player;
-using Robust.Client.UserInterface;
 using Robust.Client.UserInterface.Controllers;
 using Robust.Client.UserInterface.Controls;
-using Robust.Shared.GameObjects;
 using Robust.Shared.Network;
+using Robust.Shared.Player;
 using Robust.Shared.Prototypes;
-using Robust.Shared.Timing;
 using System.Linq;
 
 namespace Content.Client._BaroStation.Achievements;
 
-public sealed class AchievementsUIController : UIController,
+public sealed partial class AchievementsUIController : UIController,
     IOnStateEntered<LobbyState>,
     IOnStateExited<LobbyState>
 {
@@ -22,24 +18,23 @@ public sealed class AchievementsUIController : UIController,
     [Dependency] private readonly IPrototypeManager _prototypeManager = default!;
     [Dependency] private readonly IEntityManager _entityManager = default!;
     [Dependency] private readonly IPlayerManager _playerManager = default!;
-    [Dependency] private readonly IGameTiming _timing = default!;
 
+    private static AchievementsUIController? _instance;
     private AchievementsWindow? _window;
+    public static event Action<HashSet<string>>? OnAchievementsUpdated;
     private readonly List<AchievementPrototype> _allAchievements = new();
     private HashSet<string> _earnedAchievements = new();
-    private ISawmill _sawmill = default!;
     private bool _hasCachedData;
+    private NetUserId? _lastUserId;
 
     public override void Initialize()
     {
+        _instance = this;
         base.Initialize();
-
-        _sawmill = Logger.GetSawmill("achievements.ui");
 
         foreach (var proto in _prototypeManager.EnumeratePrototypes<AchievementPrototype>())
         {
             _allAchievements.Add(proto);
-            _sawmill.Info($"Loaded achievement prototype: {proto.ID}");
         }
 
         _allAchievements.Sort((a, b) => string.Compare(a.ID, b.ID, StringComparison.Ordinal));
@@ -48,15 +43,55 @@ public sealed class AchievementsUIController : UIController,
         SubscribeNetworkEvent<AchievementsStateMessage>(OnAchievementsState);
 
         _netManager.ClientConnectStateChanged += OnClientConnectStateChanged;
+        _netManager.Disconnect += OnDisconnect;
+
+        _playerManager.LocalSessionChanged += OnLocalSessionChanged;
+    }
+
+    public static bool HasAchievementStatic(string achievementId)
+    {
+        return _instance?._earnedAchievements.Contains(achievementId) ?? false;
+    }
+
+    private void OnLocalSessionChanged((ICommonSession? Old, ICommonSession? New) args)
+    {
+        var newUserId = args.New?.UserId;
+
+        if (_lastUserId != newUserId)
+        {
+            ClearCache();
+
+            if (_netManager.ClientConnectState == ClientConnectionState.Connected)
+            {
+                RequestAchievements();
+            }
+        }
+
+        _lastUserId = newUserId;
+    }
+
+    private void ClearCache()
+    {
+        _earnedAchievements.Clear();
+        _hasCachedData = false;
+
+        if (_window != null && !_window.Disposed)
+        {
+            _window.ClearAchievements();
+        }
     }
 
     private void OnClientConnectStateChanged(ClientConnectionState obj)
     {
-        _sawmill.Info($"Client connection state changed: {obj}");
         if (obj == ClientConnectionState.Connected)
         {
             RequestAchievements();
         }
+    }
+
+    private void OnDisconnect(object? sender, NetDisconnectedArgs e)
+    {
+        ClearCache();
     }
 
     public void OnStateEntered(LobbyState state)
@@ -67,7 +102,6 @@ public sealed class AchievementsUIController : UIController,
 
     public void OnStateExited(LobbyState state)
     {
-        _window?.Close();
     }
 
     private void EnsureWindow()
@@ -88,7 +122,6 @@ public sealed class AchievementsUIController : UIController,
 
     private void OnWindowOpened()
     {
-        _sawmill.Info("Window opened, requesting achievements");
         RequestAchievements();
     }
 
@@ -107,29 +140,21 @@ public sealed class AchievementsUIController : UIController,
         }
     }
 
-    private void RequestAchievements()
+    public void RequestAchievements()
     {
         if (_netManager.ClientConnectState != ClientConnectionState.Connected)
         {
-            _sawmill.Warning("Cannot request achievements: not connected to server");
             return;
         }
 
-        _sawmill.Info("Requesting achievements from server...");
-        _entityManager.EventBus.RaiseEvent(EventSource.Network, new RequestAchievementsMessage());
+        var msg = new RequestAchievementsMessage();
+        _entityManager.EventBus.RaiseEvent(EventSource.Network, msg);
     }
 
     private void OnAchievementsState(AchievementsStateMessage msg, EntitySessionEventArgs args)
     {
-        _sawmill.Info($"Received AchievementsStateMessage with {msg.EarnedIds.Count} earned IDs");
-
         _earnedAchievements = new HashSet<string>(msg.EarnedIds);
         _hasCachedData = true;
-
-        foreach (var id in msg.EarnedIds)
-        {
-            _sawmill.Info($"  - Earned: {id}");
-        }
 
         if (_window != null && !_window.Disposed)
         {
@@ -140,15 +165,19 @@ public sealed class AchievementsUIController : UIController,
                 _window.UpdateAchievements(_allAchievements, _earnedAchievements);
             }
         }
+
+        OnAchievementsUpdated?.Invoke(_earnedAchievements);
+    }
+
+    public bool HasAchievement(string achievementId)
+    {
+        return _earnedAchievements.Contains(achievementId);
     }
 
     private void OnAchievementEarned(AchievementEarnedMessage msg, EntitySessionEventArgs args)
     {
-        _sawmill.Info($"Achievement earned: {msg.AchievementId}");
-
         if (!_allAchievements.Any(a => a.ID == msg.AchievementId))
         {
-            _sawmill.Warning($"Unknown achievement ID: {msg.AchievementId}");
             return;
         }
 
@@ -177,27 +206,5 @@ public sealed class AchievementsUIController : UIController,
         var toast = new ToastNotification(proto);
         toast.OnClosed += () => toast.Dispose();
         toast.Show();
-    }
-
-    private void OnResetPressed(BaseButton.ButtonEventArgs args)
-    {
-        if (_netManager.ClientConnectState != ClientConnectionState.Connected)
-        {
-            _sawmill.Warning("Cannot reset achievements: not connected to server");
-            return;
-        }
-
-        _earnedAchievements.Clear();
-        _hasCachedData = true;
-
-        if (_window != null && !_window.Disposed)
-        {
-            _window.CacheAchievements(_allAchievements, _earnedAchievements);
-
-            if (_window.IsOpen)
-            {
-                _window.UpdateAchievements(_allAchievements, _earnedAchievements);
-            }
-        }
     }
 }
