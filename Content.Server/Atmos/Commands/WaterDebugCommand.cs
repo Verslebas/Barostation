@@ -1,16 +1,15 @@
-// Content.Server/Atmos/Commands/WaterDebugCommand.cs
 using Robust.Shared.Console;
 using Content.Server.Administration;
 using Content.Shared.Administration;
 using Content.Server.Atmos.EntitySystems;
-using Content.Shared.Atmos;  // Добавлено для Gas.Water и Atmospherics
+using Content.Shared.Atmos;
 
 namespace Content.Server.Atmos.Commands;
 
 [AdminCommand(AdminFlags.Debug)]
-public sealed class WaterDebugCommand : IConsoleCommand
+public sealed partial class WaterDebugCommand : IConsoleCommand
 {
-    [Dependency] private readonly IEntityManager _entManager = default!;
+    [Dependency] private IEntityManager _entManager = default!;
 
     public string Command => "showwater";
     public string Description => "Показывает количество воды на тайлах";
@@ -35,7 +34,7 @@ public sealed class WaterDebugCommand : IConsoleCommand
         }
 
         var tile = atmosSystem.GetTileMixture(playerEnt);
-        var waterAmount = tile?.GetMoles(Content.Shared.Atmos.Gas.Water) ?? 0;  // Полный путь
+        var waterAmount = tile?.GetMoles(Content.Shared.Atmos.Gas.Water) ?? 0;
 
         shell.WriteLine($"Воды в текущем тайле: {waterAmount:F2} молей");
 

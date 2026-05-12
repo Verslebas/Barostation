@@ -40,7 +40,7 @@ public sealed partial class AchievementsWindow : FancyWindow
         _cachedAllAchievements.Clear();
         ClearList(EarnedList);
         ClearList(LockedList);
-        StatsLabel.Text = "Loading achievements...";
+        StatsLabel.Text = Loc.GetString("achievements-loading");
     }
 
     public void UpdateAchievements(List<AchievementPrototype> allAchievements, HashSet<string> earnedIds)
@@ -50,12 +50,12 @@ public sealed partial class AchievementsWindow : FancyWindow
 
         if (allAchievements.Count == 0)
         {
-            StatsLabel.Text = "No achievements found";
+            StatsLabel.Text = Loc.GetString("achievements-none-found");
             return;
         }
 
         var earnedCount = earnedIds.Count;
-        StatsLabel.Text = $"Achievements: {earnedCount} / {allAchievements.Count}";
+        StatsLabel.Text = Loc.GetString("achievements-stats", ("earned", earnedCount), ("total", allAchievements.Count));
 
         var earnedAchievements = new List<AchievementPrototype>();
         var lockedAchievements = new List<AchievementPrototype>();
@@ -94,7 +94,7 @@ public sealed partial class AchievementsWindow : FancyWindow
         }
         else
         {
-            StatsLabel.Text = "Loading achievements...";
+            StatsLabel.Text = Loc.GetString("achievements-loading");
 
             var entityManager = IoCManager.Resolve<IEntityManager>();
             entityManager.EventBus.RaiseEvent(EventSource.Network, new RequestAchievementsMessage());

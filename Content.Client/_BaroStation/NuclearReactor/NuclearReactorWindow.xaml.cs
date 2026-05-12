@@ -17,7 +17,7 @@ public sealed partial class NuclearReactorWindow : DefaultWindow
     public event Action<int>? SetCoolingLevel;
     private bool _isTargetTempFocused;
 
-    private readonly SlotButton[] _slotButtons = new SlotButton[4];
+    private SlotButton[] _slotButtons = new SlotButton[4];
     private NuclearReactorUiState? _lastState;
 
     public NuclearReactorWindow()

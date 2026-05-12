@@ -1,10 +1,8 @@
 using Content.Server.Database;
-using Content.Server.GameTicking;
 using Content.Shared._BaroStation.Achievements;
 using Content.Shared.GameTicking;
 using Content.Shared.Inventory;
 using Content.Shared.Inventory.Events;
-using Robust.Shared.Console;
 using Robust.Shared.Network;
 using Robust.Shared.Player;
 using Robust.Shared.Prototypes;
@@ -16,11 +14,9 @@ namespace Content.Server._BaroStation.Achievements;
 public sealed partial class AchievementsSystem : SharedAchievementsSystem
 {
     [Dependency] private IPrototypeManager _prototypeManager = default!;
-    [Dependency] private ILogManager _logManager = default!;
     [Dependency] private IServerDbManager _dbManager = default!;
-    [Dependency] private IConsoleHost _consoleHost = default!;
 
-    private readonly Dictionary<string, HashSet<string>> _playerAchievements = new();
+    private Dictionary<string, HashSet<string>> _playerAchievements = new();
     public static AchievementsSystem? Instance { get; private set; }
 
     public override void Initialize()

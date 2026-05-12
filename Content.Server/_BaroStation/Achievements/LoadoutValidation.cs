@@ -1,7 +1,6 @@
 using Content.Shared.Preferences.Loadouts;
 using Content.Shared.Preferences;
 using Robust.Shared.Player;
-using System.Diagnostics.CodeAnalysis;
 using Content.Shared._BaroStation.Achievements;
 
 namespace Content.Server._BaroStation.Achievements;
