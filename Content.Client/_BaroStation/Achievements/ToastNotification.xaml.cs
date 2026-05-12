@@ -14,10 +14,8 @@ namespace Content.Client._BaroStation.Achievements;
 [GenerateTypedNameReferences]
 public sealed partial class ToastNotification : PanelContainer
 {
-    [Dependency] private readonly IResourceCache _resourceCache = default!;
-    [Dependency] private readonly IGameTiming _timing = default!;
 
-    private readonly AchievementPrototype _prototype;
+    private AchievementPrototype _prototype;
     private float _lifeTime;
     private bool _isClosing;
     private bool _isShown;

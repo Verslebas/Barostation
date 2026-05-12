@@ -1,5 +1,3 @@
-// Content.Server/Atmos/EntitySystems/SpaceWaterSystem.cs
-
 using Content.Server.GameTicking.Events;
 using Content.Shared.Atmos;
 using Content.Shared.Atmos.Components;
@@ -7,10 +5,10 @@ using Robust.Shared.Map.Components;
 
 namespace Content.Server.Atmos.EntitySystems;
 
-public sealed class SpaceWaterSystem : EntitySystem
+public sealed partial class SpaceWaterSystem : EntitySystem
 {
-    [Dependency] private readonly AtmosphereSystem _atmosphere = default!;
-    [Dependency] private readonly SharedMapSystem _mapSystem = default!;
+    [Dependency] private AtmosphereSystem _atmosphere = default!;
+    [Dependency] private SharedMapSystem _mapSystem = default!;
 
     public override void Initialize()
     {
@@ -38,17 +36,13 @@ public sealed class SpaceWaterSystem : EntitySystem
 
             var indices = tileRef.Value.GridIndices;
 
-            // Проверяем, является ли тайл космосом
             if (!_atmosphere.IsTileSpace(gridUid, null, indices))
                 continue;
 
-            // Создаём космическую воду с правильными параметрами
             var spaceWater = CreateSpaceWaterMixture();
 
-            // Устанавливаем смесь на тайл через API
             _atmosphere.SetTileMixtureInternal(gridUid, indices, spaceWater);
 
-            // Инвалидируем тайл для обновления визуализации
             _atmosphere.InvalidateTile(gridUid, indices);
         }
     }
@@ -68,8 +62,6 @@ public sealed class SpaceWaterSystem : EntitySystem
         };
 
         mixture.SetMoles(Gas.Water, requiredMoles);
-
-        // Убеждаемся, что другие газы отсутствуют
         mixture.SetMoles(Gas.Oxygen, 0);
         mixture.SetMoles(Gas.Nitrogen, 0);
         mixture.SetMoles(Gas.CarbonDioxide, 0);

@@ -3,11 +3,12 @@ using Robust.Shared.Utility;
 
 namespace Content.Shared._BaroStation.Achievements;
 
-[Prototype("achievement")]
+[Prototype]
 public sealed partial class AchievementPrototype : IPrototype
 {
     [IdDataField]
     public string ID { get; private set; } = string.Empty;
+
     [DataField(required: true)]
     public LocId Name { get; private set; }
 

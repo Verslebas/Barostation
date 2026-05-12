@@ -1,8 +1,6 @@
 using Content.Server.DeviceLinking.Systems;
 using Content.Server.Explosion.EntitySystems;
 using Content.Server.Power.Components;
-using Content.Server.Power.EntitySystems;
-using Content.Server.Radiation.Components;
 using Content.Server.Radiation.Systems;
 using Content.Shared._BaroStation.NuclearReactor;
 using Content.Shared.Containers.ItemSlots;
@@ -10,26 +8,23 @@ using Content.Shared.Interaction;
 using Content.Shared.Popups;
 using Content.Shared.Radiation.Components;
 using Content.Shared.Tools.Systems;
-using Content.Shared.UserInterface;
 using Content.Shared.Whitelist;
-using Robust.Server.GameObjects;
-using Robust.Shared.Audio.Systems;
+using Robust.Server.Audio;
 using Robust.Shared.Containers;
 using Robust.Shared.Random;
-using Robust.Server.Audio;
 using Robust.Shared.Timing;
 
 namespace Content.Server._BaroStation.NuclearReactor;
 
-public sealed class NuclearReactorSystem : SharedNuclearReactorSystem
+public sealed partial class NuclearReactorSystem : SharedNuclearReactorSystem
 {
-    [Dependency] private readonly IGameTiming _timing = default!;
-    [Dependency] private readonly ExplosionSystem _explosion = default!;
-    [Dependency] private readonly IRobustRandom _random = default!;
-    [Dependency] private readonly SharedPopupSystem _popup = default!;
-    [Dependency] private readonly ItemSlotsSystem _itemSlots = default!;
-    [Dependency] private readonly AudioSystem _audio = default!;
-    [Dependency] private readonly DeviceLinkSystem _deviceLink = default!;
+    [Dependency] private IGameTiming _timing = default!;
+    [Dependency] private ExplosionSystem _explosion = default!;
+    [Dependency] private IRobustRandom _random = default!;
+    [Dependency] private SharedPopupSystem _popup = default!;
+    [Dependency] private ItemSlotsSystem _itemSlots = default!;
+    [Dependency] private AudioSystem _audio = default!;
+    [Dependency] private DeviceLinkSystem _deviceLink = default!;
 
     public override void Initialize()
     {
@@ -54,7 +49,7 @@ public sealed class NuclearReactorSystem : SharedNuclearReactorSystem
             return;
 
         var toolSystem = EntityManager.System<SharedToolSystem>();
-        if (!toolSystem.HasQuality(args.Used, "Pulsing"))
+        if (!toolSystem.HasQuality(args.Used, SharedToolSystem.PulseQuality))
             return;
 
         if (!TryComp<NuclearReactorConsoleComponent>(args.Target, out var consoleComp))
@@ -97,7 +92,7 @@ public sealed class NuclearReactorSystem : SharedNuclearReactorSystem
             return;
 
         var toolSystem = EntityManager.System<SharedToolSystem>();
-        if (toolSystem.HasQuality(args.Used, "Pulsing"))
+        if (toolSystem.HasQuality(args.Used, SharedToolSystem.PulseQuality))
             return;
 
         if (!TryComp<UraniumRodComponent>(args.Used, out _))
@@ -339,7 +334,7 @@ public sealed class NuclearReactorSystem : SharedNuclearReactorSystem
         typeof(RadiationSourceComponent).GetField("_enabled", flags)?.SetValue(newSource, true);
 
         radiationSystem.SetSourceEnabled((uid, newSource), true);
-        EntityManager.QueueDeleteEntity(uid);
+        QueueDel(uid);
     }
 
     protected override void UpdateUI(EntityUid uid, NuclearReactorComponent comp)

@@ -14,15 +14,15 @@ public sealed partial class AchievementsUIController : UIController,
     IOnStateEntered<LobbyState>,
     IOnStateExited<LobbyState>
 {
-    [Dependency] private readonly IClientNetManager _netManager = default!;
-    [Dependency] private readonly IPrototypeManager _prototypeManager = default!;
-    [Dependency] private readonly IEntityManager _entityManager = default!;
-    [Dependency] private readonly IPlayerManager _playerManager = default!;
+    [Dependency] private IClientNetManager _netManager = default!;
+    [Dependency] private IPrototypeManager _prototypeManager = default!;
+    [Dependency] private IEntityManager _entityManager = default!;
+    [Dependency] private IPlayerManager _playerManager = default!;
 
     private static AchievementsUIController? _instance;
     private AchievementsWindow? _window;
     public static event Action<HashSet<string>>? OnAchievementsUpdated;
-    private readonly List<AchievementPrototype> _allAchievements = new();
+    private List<AchievementPrototype> _allAchievements = new();
     private HashSet<string> _earnedAchievements = new();
     private bool _hasCachedData;
     private NetUserId? _lastUserId;

@@ -8,4 +8,5 @@
         <Label Name="TitleLabel" StyleClasses="LabelHeading" ClipText="True"/>
         <Label Name="DescriptionLabel" StyleClasses="LabelSubText" ClipText="True"/>
     </BoxContainer>
+    <Label Name="StatusLabel" StyleClasses="LabelSubText" />
 </BoxContainer>

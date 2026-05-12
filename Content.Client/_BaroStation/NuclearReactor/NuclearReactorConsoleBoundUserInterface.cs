@@ -1,6 +1,5 @@
 using Content.Shared._BaroStation.NuclearReactor;
 using JetBrains.Annotations;
-using Robust.Client.GameObjects;
 
 namespace Content.Client._BaroStation.NuclearReactor;
 
@@ -21,7 +20,6 @@ public sealed class NuclearReactorConsoleBoundUserInterface : BoundUserInterface
         _window.SetTemperature += temp => SendMessage(new NuclearReactorSetTemperatureMessage(temp));
         _window.EjectRod += slot => SendMessage(new NuclearReactorEjectMessage(slot));
         _window.SetCoolingLevel += level => SendMessage(new NuclearReactorSetCoolingMessage(level));
-        _window.ClearLink += () => SendMessage(new NuclearReactorConsoleClearLinkMessage());
         _window.OpenCentered();
     }
 

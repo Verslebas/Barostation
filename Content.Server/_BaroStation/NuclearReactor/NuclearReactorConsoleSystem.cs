@@ -1,19 +1,17 @@
 using Content.Server.DeviceLinking.Systems;
 using Content.Server.Power.Components;
-using Content.Server.UserInterface;
 using Content.Shared._BaroStation.NuclearReactor;
 using Content.Shared.DeviceLinking.Events;
 using Content.Shared.Popups;
 using Robust.Server.GameObjects;
-using Robust.Shared.Player;
 
 namespace Content.Server._BaroStation.NuclearReactor;
 
-public sealed class NuclearReactorConsoleSystem : SharedNuclearReactorConsoleSystem
+public sealed partial class NuclearReactorConsoleSystem : SharedNuclearReactorConsoleSystem
 {
-    [Dependency] private readonly SharedPopupSystem _popup = default!;
-    [Dependency] private readonly UserInterfaceSystem _ui = default!;
-    [Dependency] private readonly DeviceLinkSystem _deviceLink = default!;
+    [Dependency] private SharedPopupSystem _popup = default!;
+    [Dependency] private UserInterfaceSystem _ui = default!;
+    [Dependency] private DeviceLinkSystem _deviceLink = default!;
 
     public override void Initialize()
     {
@@ -138,7 +136,7 @@ public sealed class NuclearReactorConsoleSystem : SharedNuclearReactorConsoleSys
         if (!_ui.IsUiOpen(uid, NuclearReactorConsoleUiKey.Key))
             return;
 
-        if (comp.LinkedReactor != null && !EntityManager.EntityExists(comp.LinkedReactor.Value))
+        if (comp.LinkedReactor != null && !Exists(comp.LinkedReactor.Value))
         {
             comp.LinkedReactor = null;
             Dirty(uid, comp);

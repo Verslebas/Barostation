@@ -6,7 +6,7 @@ namespace Content.Shared._BaroStation.Achievements;
 [Virtual]
 public partial class SharedAchievementsSystem : EntitySystem
 {
-    [Dependency] protected readonly IPrototypeManager PrototypeManager = default!;
+    [Dependency] protected IPrototypeManager PrototypeManager = default!;
 
     public static IAchievementChecker? AchievementChecker { get; set; }
 

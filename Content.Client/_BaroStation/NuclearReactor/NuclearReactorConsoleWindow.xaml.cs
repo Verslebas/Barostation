@@ -6,8 +6,6 @@ using Robust.Client.UserInterface.Controls;
 using Robust.Client.UserInterface.CustomControls;
 using Robust.Client.UserInterface.XAML;
 using Robust.Client.UserInterface;
-using Robust.Shared.IoC;
-using Robust.Shared.Log;
 
 namespace Content.Client._BaroStation.NuclearReactor;
 
@@ -18,10 +16,8 @@ public sealed partial class NuclearReactorConsoleWindow : DefaultWindow
     public event Action<float>? SetTemperature;
     public event Action<int>? EjectRod;
     public event Action<int>? SetCoolingLevel;
-    public event Action? ClearLink;
 
-    private static readonly ISawmill Logger = IoCManager.Resolve<ILogManager>().GetSawmill("nuclear.ui");
-    private readonly SlotButton[] _slotButtons = new SlotButton[4];
+    private SlotButton[] _slotButtons = new SlotButton[4];
     private NuclearReactorConsoleUiState? _lastState;
     private PanelContainer _overlayPanel = null!;
     private Label _overlayLabel = null!;
@@ -125,99 +121,99 @@ public sealed partial class NuclearReactorConsoleWindow : DefaultWindow
 
         MainContent.Visible = true;
         _overlayPanel.Visible = false;
-     _lastState = state;
+        _lastState = state;
 
-            if (RodsGrid == null || StatusLabel == null ||
+        if (RodsGrid == null || StatusLabel == null ||
                 ToggleButton == null || StateLabel == null || OptimalTempLabel == null ||
                 TemperatureLabel == null || TemperatureBar == null || TargetTempInput == null ||
                 SetTempButton == null || CoolingDownButton == null || CoolingUpButton == null ||
                 CoolingLevelLabel == null || PowerLabel == null || IntegrityLabel == null ||
                 DepletedWarningLabel == null || WarningLabel == null)
-            {
-                return;
-            }
+        {
+            return;
+        }
 
-            var hasControl = state.HasPower && state.HasReactor;
+        var hasControl = state.HasPower && state.HasReactor;
 
-            ToggleButton.Disabled = !hasControl;
-            TargetTempInput.Editable = hasControl;
-            SetTempButton.Disabled = !hasControl;
-            CoolingDownButton.Disabled = !hasControl || state.CoolingLevel <= 1;
-            CoolingUpButton.Disabled = !hasControl || state.CoolingLevel >= 8;
+        ToggleButton.Disabled = !hasControl;
+        TargetTempInput.Editable = hasControl;
+        SetTempButton.Disabled = !hasControl;
+        CoolingDownButton.Disabled = !hasControl || state.CoolingLevel <= 1;
+        CoolingUpButton.Disabled = !hasControl || state.CoolingLevel >= 8;
 
-            if (!hasControl)
-                StatusLabel.Text = !state.HasReactor
+        if (!hasControl)
+            StatusLabel.Text = !state.HasReactor
                     ? Loc.GetString("nuclear-reactor-console-no-reactor-short")
                     : Loc.GetString("nuclear-reactor-status-inactive");
-            else if (state.ReactorEnabled)
-                StatusLabel.Text = Loc.GetString("nuclear-reactor-status-active");
-            else
-                StatusLabel.Text = Loc.GetString("nuclear-reactor-status-inactive");
+        else if (state.ReactorEnabled)
+            StatusLabel.Text = Loc.GetString("nuclear-reactor-status-active");
+        else
+            StatusLabel.Text = Loc.GetString("nuclear-reactor-status-inactive");
 
-            ToggleButton.Text = state.ReactorEnabled
+        ToggleButton.Text = state.ReactorEnabled
                 ? Loc.GetString("nuclear-reactor-window-toggle-off")
                 : Loc.GetString("nuclear-reactor-window-toggle-on");
 
-            int activeRodCount = 0;
-            foreach (var slot in state.RodSlots)
-                if (slot.HasItem && !slot.Depleted) activeRodCount++;
+        int activeRodCount = 0;
+        foreach (var slot in state.RodSlots)
+            if (slot.HasItem && !slot.Depleted) activeRodCount++;
 
-            OptimalTempLabel.Text = $"{activeRodCount * 1000f:F0} K";
-            DepletedWarningLabel.Visible = state.HasDepletedRod;
+        OptimalTempLabel.Text = $"{activeRodCount * 1000f:F0} K";
+        DepletedWarningLabel.Visible = state.HasDepletedRod;
 
-            if (activeRodCount == 0)
+        if (activeRodCount == 0)
+        {
+            StateLabel.Text = Loc.GetString("nuclear-reactor-mode-no-rods");
+            StateLabel.SetOnlyStyleClass("LabelSecondaryColor");
+        }
+        else
+        {
+            float optimalMin = state.OptimalTemperature - 300f;
+            float optimalMax = state.OptimalTemperature + 300f;
+
+            if (state.CurrentTemperature < optimalMin)
             {
-                StateLabel.Text = Loc.GetString("nuclear-reactor-mode-no-rods");
-                StateLabel.SetOnlyStyleClass("LabelSecondaryColor");
+                StateLabel.Text = Loc.GetString("nuclear-reactor-mode-insufficient", ("min", optimalMin));
+                StateLabel.SetOnlyStyleClass("LabelCaution");
+            }
+            else if (state.CurrentTemperature > optimalMax)
+            {
+                StateLabel.Text = Loc.GetString("nuclear-reactor-mode-excessive", ("max", optimalMax));
+                StateLabel.SetOnlyStyleClass("LabelDanger");
             }
             else
             {
-                float optimalMin = state.OptimalTemperature - 300f;
-                float optimalMax = state.OptimalTemperature + 300f;
-
-                if (state.CurrentTemperature < optimalMin)
-                {
-                    StateLabel.Text = Loc.GetString("nuclear-reactor-mode-insufficient", ("min", optimalMin));
-                    StateLabel.SetOnlyStyleClass("LabelCaution");
-                }
-                else if (state.CurrentTemperature > optimalMax)
-                {
-                    StateLabel.Text = Loc.GetString("nuclear-reactor-mode-excessive", ("max", optimalMax));
-                    StateLabel.SetOnlyStyleClass("LabelDanger");
-                }
-                else
-                {
-                    StateLabel.Text = Loc.GetString("nuclear-reactor-mode-optimal", ("min", optimalMin), ("max", optimalMax));
-                    StateLabel.SetOnlyStyleClass("LabelGood");
-                }
+                StateLabel.Text = Loc.GetString("nuclear-reactor-mode-optimal", ("min", optimalMin), ("max", optimalMax));
+                StateLabel.SetOnlyStyleClass("LabelGood");
             }
+        }
 
-            TemperatureLabel.Text = $"{state.CurrentTemperature:F1} K";
-            TemperatureBar.Value = state.CurrentTemperature;
+        TemperatureLabel.Text = $"{state.CurrentTemperature:F1} K";
+        TemperatureBar.Value = state.CurrentTemperature;
 
-            if (!_isTargetTempFocused)
-            {
-                TargetTempInput.Text = state.TargetTemperature.ToString("F0");
-            }
+        if (!_isTargetTempFocused)
+        {
+            TargetTempInput.Text = state.TargetTemperature.ToString("F0");
+        }
 
-            CoolingLevelLabel.Text = state.CoolingLevel.ToString();
-            PowerLabel.Text = $"{state.PowerOutput / 1000f:F1} kW";
+        CoolingLevelLabel.Text = state.CoolingLevel.ToString();
+        PowerLabel.Text = $"{state.PowerOutput / 1000f:F1} kW";
 
-            IntegrityLabel.Text = $"{state.Integrity:F0}%";
-            if (state.Integrity < 30)
-                IntegrityLabel.SetOnlyStyleClass("LabelDanger");
-            else if (state.Integrity < 60)
-                IntegrityLabel.SetOnlyStyleClass("LabelCaution");
-            else
-                IntegrityLabel.SetOnlyStyleClass("LabelGood");
+        IntegrityLabel.Text = $"{state.Integrity:F0}%";
+        if (state.Integrity < 30)
+            IntegrityLabel.SetOnlyStyleClass("LabelDanger");
+        else if (state.Integrity < 60)
+            IntegrityLabel.SetOnlyStyleClass("LabelCaution");
+        else
+            IntegrityLabel.SetOnlyStyleClass("LabelGood");
 
-            for (int i = 0; i < 4; i++)
-            {
-                if (i < state.RodSlots.Length)
-                    _slotButtons[i].UpdateState(state.RodSlots[i]);
-            }
+        for (int i = 0; i < 4; i++)
+        {
+            if (i < state.RodSlots.Length)
+                _slotButtons[i].UpdateState(state.RodSlots[i]);
+        }
 
-            WarningLabel.Visible = activeRodCount == 0;
+        WarningLabel.Visible = activeRodCount == 0;
     }
 
     private sealed class SlotButton : Button

@@ -1,11 +1,9 @@
-using Content.Shared.Interaction;
 using Robust.Shared.Network;
 
 namespace Content.Shared._BaroStation.NuclearReactor;
 
-public abstract class SharedNuclearReactorConsoleSystem : EntitySystem
+public abstract partial class SharedNuclearReactorConsoleSystem : EntitySystem
 {
-    [Dependency] private readonly INetManager _net = default!;
 
     public override void Initialize()
     {
@@ -13,28 +11,6 @@ public abstract class SharedNuclearReactorConsoleSystem : EntitySystem
 
         SubscribeLocalEvent<NuclearReactorConsoleComponent, NuclearReactorConsoleLinkMessage>(OnLinkMessage);
         SubscribeLocalEvent<NuclearReactorConsoleComponent, NuclearReactorConsoleClearLinkMessage>(OnClearLinkMessage);
-    }
-
-    private void OnAfterInteractUsing(EntityUid uid, NuclearReactorConsoleComponent comp, AfterInteractUsingEvent args)
-    {
-        if (args.Handled || args.Target == null)
-            return;
-
-        if (!TryComp<NuclearReactorComponent>(args.Target, out _))
-        {
-            if (_net.IsServer)
-                PopupLinkFail(uid, args.User);
-            return;
-        }
-
-        args.Handled = true;
-        comp.LinkedReactor = args.Target;
-        Dirty(uid, comp);
-
-        if (_net.IsServer)
-            PopupLinkSuccess(uid, args.User);
-
-        UpdateConsoleUi(uid, comp);
     }
 
     protected virtual void PopupLinkFail(EntityUid uid, EntityUid user) { }
@@ -56,35 +32,6 @@ public abstract class SharedNuclearReactorConsoleSystem : EntitySystem
         comp.LinkedReactor = null;
         Dirty(uid, comp);
         UpdateConsoleUi(uid, comp);
-    }
-
-    private void OnToggleMessage(EntityUid uid, NuclearReactorConsoleComponent comp, NuclearReactorToggleMessage args)
-    {
-        if (comp.LinkedReactor is { Valid: true } reactor)
-            SendReactorMessage(reactor, args);
-    }
-
-    private void OnSetTempMessage(EntityUid uid, NuclearReactorConsoleComponent comp, NuclearReactorSetTemperatureMessage args)
-    {
-        if (comp.LinkedReactor is { Valid: true } reactor)
-            SendReactorMessage(reactor, args);
-    }
-
-    private void OnEjectMessage(EntityUid uid, NuclearReactorConsoleComponent comp, NuclearReactorEjectMessage args)
-    {
-        if (comp.LinkedReactor is { Valid: true } reactor)
-            SendReactorMessage(reactor, args);
-    }
-
-    private void OnSetCoolingMessage(EntityUid uid, NuclearReactorConsoleComponent comp, NuclearReactorSetCoolingMessage args)
-    {
-        if (comp.LinkedReactor is { Valid: true } reactor)
-            SendReactorMessage(reactor, args);
-    }
-
-    private void SendReactorMessage(EntityUid reactor, BoundUserInterfaceMessage message)
-    {
-        RaiseLocalEvent(reactor, message);
     }
 
     protected virtual void UpdateConsoleUi(EntityUid uid, NuclearReactorConsoleComponent comp) { }

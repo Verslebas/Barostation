@@ -1,6 +1,5 @@
 using Content.Shared._BaroStation.NuclearReactor;
 using JetBrains.Annotations;
-using Robust.Client.GameObjects;
 
 namespace Content.Client._BaroStation.NuclearReactor;
 
