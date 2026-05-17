@@ -1,9 +1,10 @@
+using Content.Shared.EntityConditions;
 using Robust.Shared.Prototypes;
 using Robust.Shared.Utility;
 
 namespace Content.Shared._BaroStation.Achievements;
 
-[Prototype]
+[Prototype("achievement")]
 public sealed partial class AchievementPrototype : IPrototype
 {
     [IdDataField]
@@ -17,4 +18,7 @@ public sealed partial class AchievementPrototype : IPrototype
 
     [DataField]
     public ResPath Icon { get; private set; } = new("/Textures/_BaroStation/Achievements/default.png");
+
+    [DataField("condition", required: true)]
+    public EntityCondition Condition = default!;
 }

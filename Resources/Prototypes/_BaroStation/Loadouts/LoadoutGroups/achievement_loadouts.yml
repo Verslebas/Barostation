@@ -5,6 +5,7 @@
   maxLimit: 3
   loadouts:
   - ClownMaskAchievementReward
+  - SunglassesAchievementReward
 
 - type: loadout
   id: ClownMaskAchievementReward
@@ -15,3 +16,13 @@
     achievementId: ClownMaskAchievement
   equipment:
     mask: ClothingMaskClown
+
+- type: loadout
+  id: SunglassesAchievementReward
+  name: loadout-sunglasses-reward-name
+  description: loadout-sunglasses-reward-desc
+  effects:
+  - !type:AchievementLoadoutEffect
+    achievementId: SunglassesAchievement
+  equipment:
+    eyes: ClothingEyesGlassesCheapSunglasses

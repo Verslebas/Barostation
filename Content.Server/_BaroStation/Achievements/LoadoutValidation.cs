@@ -18,7 +18,7 @@ public static class LoadoutValidation
             return true;
         }
 
-        var system = AchievementsSystem.Instance;
+        var system = AchievementsServerSystem.Instance;
 
         if (system == null)
         {
