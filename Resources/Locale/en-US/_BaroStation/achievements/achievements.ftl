@@ -1,5 +1,11 @@
 achievements-clown-mask-name = No one cared who I was...
 achievements-clown-mask-desc = Until I put on the mask
+achievements-sunglasses-name = Cool Shades
+achievements-sunglasses-desc = Look cool while staying cool
+achievements-cat-killer-name = MonsterMeow
+achievements-cat-killer-desc = You killed a cat.. Why?
+achievements-carp-slayer-name = Fried Ide
+achievements-carp-slayer-desc = Defeated a space carp
 achievements-earned-label = Earned!
 achievements-not-earned-label = Not earned
 achievements-window-title = Achievements
@@ -11,15 +17,11 @@ achievements-reset-button = Reset
 achievements-loading = Loading achievements...
 achievements-none-found = No achievements found
 achievements-stats = Achievements: {$earned} / {$total}
-
-# Headers
 achievements-earned-header = Earned
 achievements-locked-header = Locked
-
-# Loadout validation message
 loadout-achievement-not-earned = Achievement "{$achievement}" is required for this item
-
-# Loadout group
 loadout-group-achievement-rewards = Achievement Rewards
 loadout-clown-mask-reward-name = Clown Mask
 loadout-clown-mask-reward-desc = Reward for the "Clown Mask" achievement
+loadout-sunglasses-reward-name = Sunglasses
+loadout-sunglasses-reward-desc = Reward for the "Cool Shades" achievement

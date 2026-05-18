@@ -1,5 +1,11 @@
 achievements-clown-mask-name = Всем было плевать кто я...
 achievements-clown-mask-desc = Пока я не надел маску
+achievements-sunglasses-name = Крутые очки
+achievements-sunglasses-desc = Выгляди круто, оставаясь в тени
+achievements-cat-killer-name = МонстрОкот
+achievements-cat-killer-desc = Ты убил кота.. Зачем?
+achievements-carp-slayer-name = Жаренный язь
+achievements-carp-slayer-desc = Победи космического карпа
 achievements-earned-label = Получено!
 achievements-not-earned-label = Не получено
 achievements-window-title = Достижения
@@ -11,15 +17,11 @@ achievements-reset-button = Сбросить
 achievements-loading = Загрузка достижений...
 achievements-none-found = Достижения не найдены
 achievements-stats = Достижений: {$earned} / {$total}
-
-# Новые строки для заголовков
 achievements-earned-header = Получены
 achievements-locked-header = Не получены
-
-# Loadout validation message
 loadout-achievement-not-earned = Требуется достижение "{$achievement}"
-
-# Loadout group
 loadout-group-achievement-rewards = Награды за достижения
 loadout-clown-mask-reward-name = Маска клоуна
 loadout-clown-mask-reward-desc = Награда за достижение "Клоун-маска"
+loadout-sunglasses-reward-name = Солнцезащитные очки
+loadout-sunglasses-reward-desc = Награда за достижение "Крутые очки"
