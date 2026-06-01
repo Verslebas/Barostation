@@ -3,3 +3,36 @@
   name: achievements-clown-mask-name
   description: achievements-clown-mask-desc
   icon: /Textures/_BaroStation/Achievements/clown_mask.png
+  condition:
+    !type:EquipItemCondition
+    items:
+      - ClothingMaskClown
+
+- type: achievement
+  id: SunglassesAchievement
+  name: achievements-sunglasses-name
+  description: achievements-sunglasses-desc
+  icon: /Textures/_BaroStation/Achievements/sunglasses.png
+  condition:
+    !type:EquipItemCondition
+    items:
+      - ClothingEyesGlassesSunglasses
+      - ClothingEyesGlassesCheapSunglasses
+
+- type: achievement
+  id: CatKillerAchievement
+  name: achievements-cat-killer-name
+  description: achievements-cat-killer-desc
+  icon: /Textures/_BaroStation/Achievements/cat_killer.png
+  condition:
+    !type:KillMobCondition
+    containsId: "MobCat"
+
+- type: achievement
+  id: CarpSlayerAchievement
+  name: achievements-carp-slayer-name
+  description: achievements-carp-slayer-desc
+  icon: /Textures/_BaroStation/Achievements/carp_slayer.png
+  condition:
+    !type:KillMobCondition
+    containsId: "MobCarp"
